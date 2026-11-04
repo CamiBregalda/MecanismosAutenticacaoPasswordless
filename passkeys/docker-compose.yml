@@ -1,0 +1,16 @@
+services:
+  passkeys:
+    build: .
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      PORT: "3000"
+      ORIGIN: "${ORIGIN:-http://localhost:3000}"
+      RP_ID: "${RP_ID:-localhost}"
+      RP_NAME: "${RP_NAME:-Guia de Passkeys (TCC)}"
+      USER_VERIFICATION: "${USER_VERIFICATION:-preferred}"
+      SESSION_SECRET: "${SESSION_SECRET:?Defina SESSION_SECRET no arquivo .env}"
+      DB_PATH: "/data/passkeys.db"
+      TRUST_PROXY: "${TRUST_PROXY:-0}"
+    volumes:
+      - ./data:/data

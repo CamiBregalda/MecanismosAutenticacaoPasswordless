@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guia de Passkeys — Implementação de referência</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main>
+    <h1>Passkeys (WebAuthn / FIDO2)</h1>
+    <p class="lead">Implementação de referência do TCC — autenticação sem senha.</p>
+
+    <p id="unsupported" class="alert" hidden>
+      Este navegador não suporta WebAuthn. Use uma versão recente do Chrome, Edge, Firefox ou Safari.
+    </p>
+
+    <section id="guest">
+      <h2>1. Criar conta com passkey</h2>
+      <label for="reg-username">Nome de usuário</label>
+      <input id="reg-username" type="text" autocomplete="username webauthn" placeholder="ex.: camila">
+      <button id="btn-register" type="button">Criar passkey</button>
+
+      <h2>2. Entrar com passkey</h2>
+      <p class="hint">Opcional: informe o nome de usuário. Se deixar em branco, o sistema lista as passkeys disponíveis neste domínio.</p>
+      <label for="login-username">Nome de usuário (opcional)</label>
+      <input id="login-username" type="text" autocomplete="username webauthn">
+      <button id="btn-login" type="button">Entrar com passkey</button>
+    </section>
+
+    <section id="account" hidden>
+      <h2>Sessão autenticada</h2>
+      <p>Usuário: <strong id="who"></strong></p>
+      <h3>Passkeys cadastradas</h3>
+      <ul id="credentials"></ul>
+      <button id="btn-add" type="button">Adicionar outra passkey</button>
+      <button id="btn-logout" type="button" class="secondary">Sair</button>
+    </section>
+
+    <p id="status" role="status" aria-live="polite"></p>
+
+    <h3>Registro das etapas</h3>
+    <div id="log" class="log"></div>
+  </main>
+
+  <script src="/vendor/index.umd.min.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
