@@ -153,7 +153,7 @@ A última linha explicita um limite frequentemente omitido: passkeys eliminam a 
 ### 2.8 Limitações do mecanismo
 
 - **Recuperação de acesso.** Não há "esqueci minha senha". A recuperação depende de outras credenciais cadastradas, do provedor de sincronização ou de um mecanismo alternativo, ponto citado de forma recorrente na literatura revisada [Yusop et al. 2025]. O guia de tokens de software aborda uma contingência.
-- **Dependência do ecossistema.** A experiência de sincronização varia entre fornecedores de plataforma e a portabilidade entre provedores ainda é limitada [CITAR].
+- **Dependência do ecossistema.** A experiência de sincronização varia entre fornecedores de plataforma e a portabilidade entre provedores ainda é limitada.
 - **Compreensão do usuário.** Estudos de usabilidade indicam equívocos sobre o que é armazenado no dispositivo e sobre biometria [Yusop et al. 2025].
 - **Atestação e confiança no autenticador.** Com `attestation: "none"`, o servidor confia na declaração do autenticador, sem validar fabricante ou modelo.
 - **Enumeração de contas.** Informar que um nome de usuário já existe revela sua existência (ver seção 8).
@@ -269,7 +269,7 @@ A aplicação fica responsável por **persistir** as chaves públicas, **guardar
 
 1. **Desafio na sessão do servidor, com uso único e validade de 5 minutos** (seção 5.5).
 2. **User handle aleatório**, desvinculado do nome de usuário (seção 5.7).
-3. **Lista de algoritmos fixada** em `[-8, -7, -257]` (EdDSA, ES256 e RS256). Na versão 14 do SimpleWebAuthn, a lista padrão pode incluir um algoritmo pós-quântico quando o runtime o suporta, o que tornaria o formato das novas credenciais dependente da versão do Node.js. Fixar a lista elimina essa variação e é aplicado na geração das opções e na verificação [CITAR: notas de versão do SimpleWebAuthn v14].
+3. **Lista de algoritmos fixada** em `[-8, -7, -257]` (EdDSA, ES256 e RS256). Na versão 14 do SimpleWebAuthn, a lista padrão pode incluir um algoritmo pós-quântico quando o runtime o suporta, o que tornaria o formato das novas credenciais dependente da versão do Node.js. Fixar a lista elimina essa variação e é aplicado na geração das opções e na verificação.
 4. **Credenciais detectáveis** (`residentKey: "required"`), para permitir login sem nome de usuário.
 5. **`attestation: "none"`**, por privacidade e para evitar dependências externas.
 6. **Impedimento de remover a última passkey**, para evitar o bloqueio da conta.
@@ -332,12 +332,10 @@ npm install
 
 Dependências de execução:
 
-- `@simplewebauthn/server` e `@simplewebauthn/browser`: implementação do protocolo (versão 14; segundo as notas de versão, a 14.0.2 corrige duas vulnerabilidades de severidade moderada do pacote de servidor, de modo que o projeto exige ao menos essa versão **[CITAR: avisos de segurança do projeto]**).
+- `@simplewebauthn/server` e `@simplewebauthn/browser`: implementação do protocolo (versão 14; segundo as notas de versão, a 14.0.2 corrige duas vulnerabilidades de severidade moderada do pacote de servidor, de modo que o projeto exige ao menos essa versão).
 - `express` (versão 5, que encaminha automaticamente erros de funções assíncronas ao tratador de erros) e `express-session`: servidor HTTP e sessão.
 
 Dependências de desenvolvimento: `typescript`, `tsx` (executa TypeScript diretamente) e as definições de tipos.
-
-> **Atenção a materiais antigos.** Muitos tutoriais utilizam versões anteriores do SimpleWebAuthn. A API mudou em versões anteriores (por exemplo, o parâmetro `authenticator` foi substituído por `credential` na verificação da autenticação), e a versão 14 alterou o tipo de `transports` para `string[]`. Siga este guia e a documentação oficial atual.
 
 ### 5.2 Configurar o TypeScript
 
@@ -1652,9 +1650,9 @@ A implementação é de **referência didática**. Para uso real, considere:
 5. **Enumeração de contas no registro.** A resposta 409 revela que um nome existe. Alternativas: fluxo de registro por e-mail verificado ou mensagens indistintas.
 6. **Recuperação de acesso.** Não implementada. O guia de tokens de software apresenta um mecanismo de contingência; em produção, também são comuns verificação de identidade, e-mail verificado e múltiplas passkeys obrigatórias.
 7. **Atestação**, apenas se houver requisito regulatório de restringir autenticadores.
-8. **Preenchimento automático (*conditional UI*)**, que sugere a passkey no campo de usuário, e a **API de sinalização** (*Signal API*) do navegador, que informa o provedor de credenciais sobre remoções de passkeys; ambas disponíveis na biblioteca em suas versões recentes, e não utilizadas aqui para manter o escopo enxuto [CITAR: documentação do SimpleWebAuthn].
+8. **Preenchimento automático (*conditional UI*)**, que sugere a passkey no campo de usuário, e a **API de sinalização** (*Signal API*) do navegador, que informa o provedor de credenciais sobre remoções de passkeys; ambas disponíveis na biblioteca em suas versões recentes, e não utilizadas aqui para manter o escopo enxuto.
 9. **Autenticação pós-login.** Como visto na seção 2.7, o mecanismo não protege a sessão. Considere expiração curta e reautenticação para operações sensíveis.
-10. **Aspectos legais.** Passkeys não armazenam dados biométricos no servidor, o que reduz a exposição a obrigações da LGPD relativas a dados sensíveis; o tratamento do nome de usuário e de metadados continua sujeito à lei [CITAR: Lei nº 13.709/2018].
+10. **Aspectos legais.** Passkeys não armazenam dados biométricos no servidor, o que reduz a exposição a obrigações da LGPD relativas a dados sensíveis; o tratamento do nome de usuário e de metadados continua sujeito à lei.
 11. **Compatibilidade com chaves de segurança físicas.** O código é o mesmo, porém **não foi validado em hardware** neste trabalho.
 
 ---
@@ -1678,12 +1676,10 @@ A implementação é de **referência didática**. Para uso real, considere:
 
 ## 10. Referências
 
-> Completar no formato exigido pela instituição. Fontes primárias sugeridas:
-
-- W3C. *Web Authentication: An API for accessing Public Key Credentials*. **[CITAR: nível e data da especificação consultada]**
-- FIDO Alliance. *Client to Authenticator Protocol (CTAP)*. **[CITAR: versão consultada]**
-- FIDO Alliance. Materiais sobre passkeys. **[CITAR]**
-- SimpleWebAuthn. Documentação e notas de versão da v14. https://simplewebauthn.dev — **[CITAR: data de acesso: 20/10/2026]**
+- W3C. *Web Authentication: An API for accessing Public Key Credentials*. 
+- FIDO Alliance. *Client to Authenticator Protocol (CTAP)*. 
+- FIDO Alliance. Materiais sobre passkeys.
+- SimpleWebAuthn. Documentação e notas de versão da v14. https://simplewebauthn.dev 
 - Yusop, M. I. M. et al. (2025). Advancing passwordless authentication: a systematic review of methods, challenges, and future directions for secure user identity. *IEEE Access*, 13:13919–13943.
 - Stallings, W. and Brown, L. (2018). *Computer Security: Principles and Practice*. Pearson, 4. ed.
 - Weir, M. et al. (2010). Testing metrics for password creation policies by attacking large sets of revealed passwords. *ACM CCS*, p. 162–175.
