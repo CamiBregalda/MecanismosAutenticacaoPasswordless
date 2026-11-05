@@ -1,7 +1,6 @@
 # Guia de Uso 3 — Tokens de Software (TOTP) e Códigos de Recuperação
 
 > Parte do Trabalho de Conclusão de Curso *Investigação de Protocolos de Passwordless Authentication: uma proposta de guia* (UTFPR, Dois Vizinhos).
-> Versões das bibliotecas consultadas em 04/11/2026.
 
 ## Sumário
 
@@ -20,7 +19,7 @@
 
 ## 1. Introdução
 
-Os **tokens de software** são mecanismos que geram credenciais temporárias por meio de um aplicativo instalado no dispositivo do usuário, geralmente um *smartphone*. O padrão mais difundido é o **TOTP** (*Time-based One-Time Password*, RFC 6238), em que o aplicativo e o servidor compartilham um segredo e, a cada 30 segundos, ambos calculam o mesmo código de seis dígitos .
+Os **tokens de software** são mecanismos que geram credenciais temporárias por meio de um aplicativo instalado no dispositivo do usuário, geralmente um *smartphone*. O padrão mais difundido é o **TOTP** (*Time-based One-Time Password*, RFC 6238), em que o aplicativo e o servidor compartilham um segredo e, a cada 30 segundos, ambos calculam o mesmo código de seis dígitos.
 
 **Papel deste mecanismo no trabalho.** Diferentemente das passkeys (Guia 1) e da biometria local (Guia 2), o TOTP **não é o método mais forte** do conjunto: depende de um segredo compartilhado e permanece suscetível a *phishing* em tempo real, como já registrado na revisão teórica do trabalho. Sua inclusão justifica-se por outro papel: a **contingência e a recuperação de acesso**. A perda ou a substituição do dispositivo é uma das limitações mais citadas para mecanismos baseados em chaves [Yusop et al. 2025], e o TOTP, somado a **códigos de recuperação**, constitui uma alternativa de baixo custo, amplamente suportada e sem hardware dedicado.
 
@@ -49,7 +48,7 @@ T       = piso( (tempo_atual_Unix - T0) / X )        com T0 = 0 e X = 30 s
 TOTP    = HOTP(K, T)
 ```
 
-Assim, aplicativo e servidor, sem se comunicar, chegam ao mesmo código desde que compartilhem `K` e tenham relógios próximos .
+Assim, aplicativo e servidor, sem se comunicar, chegam ao mesmo código desde que compartilhem `K` e tenham relógios próximos.
 
 ```mermaid
 flowchart LR
@@ -71,13 +70,13 @@ O segredo precisa chegar ao aplicativo. Isso é feito por uma URI no formato *Ke
 otpauth://totp/{emissor}:{conta}?secret={BASE32}&issuer={emissor}&algorithm=SHA1&digits=6&period=30
 ```
 
-O segredo é codificado em **Base32**, sem preenchimento. Os parâmetros `algorithm`, `digits` e `period` são opcionais, mas alguns aplicativos ignoram valores diferentes de SHA-1, 6 dígitos e 30 segundos, de modo que esses são os únicos valores recomendados para compatibilidade ampla . O projeto os declara de forma explícita.
+O segredo é codificado em **Base32**, sem preenchimento. Os parâmetros `algorithm`, `digits` e `period` são opcionais, mas alguns aplicativos ignoram valores diferentes de SHA-1, 6 dígitos e 30 segundos, de modo que esses são os únicos valores recomendados para compatibilidade ampla. O projeto os declara de forma explícita.
 
 > **Ponto de atenção.** A URI **contém o segredo**. O QR Code deve ser gerado **localmente**. Serviços externos de geração de QR Code recebem a URI e, portanto, o segredo (seção 2.11).
 
 ### 2.3 Tolerância de relógio e janela de verificação
 
-Os relógios do servidor e do dispositivo nunca coincidem exatamente. O verificador aceita, por isso, códigos de passos vizinhos ao atual. Na versão 13 da biblioteca utilizada, a tolerância é expressa em **segundos** (`epochTolerance`), e 30 s equivalem a aceitar o passo anterior e o seguinte . Na versão 12 a unidade era o número de passos; materiais antigos, portanto, induzem a erro.
+Os relógios do servidor e do dispositivo nunca coincidem exatamente. O verificador aceita, por isso, códigos de passos vizinhos ao atual. Na versão 13 da biblioteca utilizada, a tolerância é expressa em **segundos** (`epochTolerance`), e 30 s equivalem a aceitar o passo anterior e o seguinte. Na versão 12 a unidade era o número de passos; materiais antigos, portanto, induzem a erro.
 
 A tolerância tem custo de segurança: com `k` passos de cada lado, existem `2k + 1` códigos válidos simultaneamente, e a probabilidade de acerto por **adivinhação** em uma tentativa é:
 
@@ -103,7 +102,7 @@ O projeto cifra o segredo com **AES-256-GCM**, cifra autenticada que detecta adu
 
 ### 2.5 Proteção contra reutilização (*replay*)
 
-Dentro da janela de validade, um código capturado (por exemplo, por observação do teclado) poderia ser reutilizado. O RFC 6238 determina que o verificador **não aceite uma segunda tentativa com o mesmo código** . A biblioteca é *stateless* e não registra códigos já usados ; a aplicação deve fazê-lo. O projeto armazena o **último passo de tempo aceito** por usuário e rejeita qualquer passo menor ou igual. A atualização é **atômica** no banco (`UPDATE ... WHERE last_step < ?`), o que impede que duas requisições simultâneas com o mesmo código sejam ambas aceitas.
+Dentro da janela de validade, um código capturado (por exemplo, por observação do teclado) poderia ser reutilizado. O RFC 6238 determina que o verificador **não aceite uma segunda tentativa com o mesmo código**. A biblioteca é *stateless* e não registra códigos já usados ; a aplicação deve fazê-lo. O projeto armazena o **último passo de tempo aceito** por usuário e rejeita qualquer passo menor ou igual. A atualização é **atômica** no banco (`UPDATE ... WHERE last_step < ?`), o que impede que duas requisições simultâneas com o mesmo código sejam ambas aceitas.
 
 ### 2.6 Códigos de recuperação
 
@@ -208,7 +207,7 @@ A primeira linha define o papel do TOTP neste trabalho: como método principal, 
 
 ### 2.10 Aspectos legais: LGPD
 
-O TOTP não trata dados biométricos. Os dados pessoais envolvidos são o nome de usuário, os metadados e a trilha de eventos (endereços e horários de tentativas, se registrados), sujeitos às regras gerais da LGPD (Lei nº 13.709/2018), inclusive as de segurança do tratamento e de comunicação de incidentes . A proteção dos segredos descrita neste guia é uma medida técnica relevante nesse contexto.
+O TOTP não trata dados biométricos. Os dados pessoais envolvidos são o nome de usuário, os metadados e a trilha de eventos (endereços e horários de tentativas, se registrados), sujeitos às regras gerais da LGPD (Lei nº 13.709/2018), inclusive as de segurança do tratamento e de comunicação de incidentes. A proteção dos segredos descrita neste guia é uma medida técnica relevante nesse contexto.
 
 ### 2.11 Tecnologias de terceiros: quando são necessárias
 
@@ -218,7 +217,7 @@ O TOTP **não exige a contratação de serviços de terceiros**. O servidor é p
 |---|---|---|
 | **Aplicativos autenticadores** (por exemplo, Google Authenticator, Microsoft Authenticator, Aegis, Bitwarden, 1Password) | Armazenam o segredo no dispositivo do usuário e geram os códigos. A interface com eles é apenas o QR Code (padrão aberto) | Fazem parte do lado do usuário. **Nenhuma integração** ou contrato com o fornecedor. Atenção: alguns sincronizam os segredos com a conta do usuário na nuvem , o que amplia a superfície de ataque e escapa ao controle do servidor |
 | **Serviços externos de geração de QR Code** | Convertem um texto em imagem | **Não, e jamais devem ser usados.** Receberiam a URI e, portanto, o **segredo**. O projeto usa a biblioteca `qrcode` localmente |
-| **Provedores de SMS ou e-mail** (por exemplo, serviços de mensagens de provedores de nuvem) | Entregam um código aleatório gerado pelo servidor | **Não.** Seria um OTP por canal externo, e não TOTP. O SMS é vulnerável à troca de chip (*SIM swap*) e a ataques à rede de telefonia, e diretrizes de identidade digital o classificam como canal restrito . Funcionaria assim: o servidor gera o código, o envia pela API do provedor e valida a resposta, com custo por mensagem e dependência do provedor |
+| **Provedores de SMS ou e-mail** (por exemplo, serviços de mensagens de provedores de nuvem) | Entregam um código aleatório gerado pelo servidor | **Não.** Seria um OTP por canal externo, e não TOTP. O SMS é vulnerável à troca de chip (*SIM swap*) e a ataques à rede de telefonia, e diretrizes de identidade digital o classificam como canal restrito. Funcionaria assim: o servidor gera o código, o envia pela API do provedor e valida a resposta, com custo por mensagem e dependência do provedor |
 | **MFA como serviço com notificação *push*** (soluções proprietárias de gestão de identidade) | O usuário aprova um aviso no celular | **Não.** Proprietário, com dependência de fornecedor, e sujeito a ataques de fadiga de aprovação  |
 | **Serviço de gestão de chaves (KMS, HSM, cofre de segredos)** (por exemplo, os oferecidos por provedores de nuvem ou por soluções de código aberto) | Guardam a chave mestra fora da aplicação | **Opcional, para produção.** Funciona por *envelope encryption*: a aplicação guarda apenas uma chave de dados cifrada e pede ao serviço que a decifre na inicialização; a chave mestra nunca sai do serviço. Troca a chave em variável de ambiente (`APP_KEY`) por uma dependência de rede e custo |
 | **Sincronização de relógio (NTP)** | O TOTP depende de horários próximos | **Sim, é requisito operacional.** Servidores modernos já sincronizam o relógio; confirme em produção. Não é "contratado" |
@@ -355,7 +354,7 @@ Instale as dependências. O comando gera o `package-lock.json`, que **deve ser v
 npm install
 ```
 
-- **`otplib`** (versão 13): implementa HOTP e TOTP. É escrita em TypeScript, tem licença MIT e utiliza, por padrão, componentes criptográficos auditados (`@noble/hashes` e `@scure/base`). O README do projeto informa que, desde a versão 13, partes do código, dos testes e da documentação foram refinadas com auxílio de IA, com revisão humana. Convém registrar essa informação ao avaliar a dependência. A versão 13 foi uma **reescrita com incompatibilidades** em relação à 12 (por exemplo, não existe mais o objeto `authenticator`, a tolerância passou a ser em segundos e tokens malformados **lançam exceção**) .
+- **`otplib`** (versão 13): implementa HOTP e TOTP. É escrita em TypeScript, tem licença MIT e utiliza, por padrão, componentes criptográficos auditados (`@noble/hashes` e `@scure/base`). O README do projeto informa que, desde a versão 13, partes do código, dos testes e da documentação foram refinadas com auxílio de IA, com revisão humana. Convém registrar essa informação ao avaliar a dependência. A versão 13 foi uma **reescrita com incompatibilidades** em relação à 12 (por exemplo, não existe mais o objeto `authenticator`, a tolerância passou a ser em segundos e tokens malformados **lançam exceção**).
 - **`qrcode`**: geração do QR Code, localmente.
 - **`express`** (versão 5) e **`express-session`**: servidor e sessão.
 
