@@ -1,7 +1,6 @@
 # Guia de Uso 1 — Chaves Criptográficas e Passkeys (WebAuthn/FIDO2)
 
 > Parte do Trabalho de Conclusão de Curso *Investigação de Protocolos de Passwordless Authentication: uma proposta de guia* (UTFPR, Dois Vizinhos).
-> Versões das bibliotecas consultadas em 20/10/2026. Os trechos marcados com **[CITAR]** exigem referência bibliográfica antes da publicação do texto.
 
 ## Sumário
 
@@ -36,13 +35,13 @@ O código completo está disponível neste repositório, na pasta `passkeys/`. O
 
 Em um sistema baseado em senhas, cliente e servidor compartilham um segredo: o servidor armazena uma derivação da senha e o cliente a apresenta a cada autenticação. Esse modelo de **segredo compartilhado** implica que o comprometimento do servidor, a captura da senha em trânsito ou a sua entrega a um site fraudulento permitem a personificação do usuário [Weir et al. 2010; Yusop et al. 2025].
 
-A criptografia assimétrica permite um modelo distinto. O usuário possui um par de chaves matematicamente relacionadas: a **chave privada**, que nunca deixa o dispositivo, e a **chave pública**, que pode ser divulgada sem prejuízo. Para provar sua identidade, o usuário não apresenta um segredo, e sim uma **assinatura digital** sobre um dado fornecido pelo servidor. O servidor verifica a assinatura com a chave pública previamente registrada. Esse esquema é denominado **desafio-resposta** (*challenge-response*): como o dado assinado (o desafio) é aleatório e de uso único, uma assinatura capturada não pode ser reutilizada em outra tentativa (resistência a *replay*) [CITAR: Stallings and Brown 2018].
+A criptografia assimétrica permite um modelo distinto. O usuário possui um par de chaves matematicamente relacionadas: a **chave privada**, que nunca deixa o dispositivo, e a **chave pública**, que pode ser divulgada sem prejuízo. Para provar sua identidade, o usuário não apresenta um segredo, e sim uma **assinatura digital** sobre um dado fornecido pelo servidor. O servidor verifica a assinatura com a chave pública previamente registrada. Esse esquema é denominado **desafio-resposta** (*challenge-response*): como o dado assinado (o desafio) é aleatório e de uso único, uma assinatura capturada não pode ser reutilizada em outra tentativa (resistência a *replay*).
 
 A consequência prática é que o banco de dados do servidor passa a conter apenas chaves públicas, cujo vazamento não permite autenticar-se. Esta é a diferença estrutural em relação a senhas, e a razão pela qual o mecanismo foi selecionado para este trabalho (seção 4.3 do texto principal).
 
 ### 2.2 O ecossistema FIDO2: WebAuthn e CTAP
 
-O **FIDO2** é um conjunto de especificações da FIDO Alliance e do W3C composto por dois protocolos complementares [CITAR: especificações oficiais]:
+O **FIDO2** é um conjunto de especificações da FIDO Alliance e do W3C composto por dois protocolos complementares :
 
 - **WebAuthn** (*Web Authentication*), padrão do W3C, define a API JavaScript (`navigator.credentials.create()` e `navigator.credentials.get()`) pela qual aplicações web solicitam a criação e o uso de credenciais, e os formatos de dados trocados com o servidor.
 - **CTAP** (*Client to Authenticator Protocol*), da FIDO Alliance, define a comunicação entre o cliente (navegador ou sistema operacional) e autenticadores externos, como chaves de segurança USB, NFC ou Bluetooth, e o telefone em fluxos entre dispositivos.
@@ -65,8 +64,8 @@ Cada credencial associa, no autenticador e no servidor, os seguintes elementos:
 - **Credential ID**: identificador opaco da credencial, gerado pelo autenticador.
 - **Par de chaves**: gerado no registro, **exclusivo para o par (usuário, RP ID)**. A chave privada permanece no autenticador.
 - **RP ID**: domínio ao qual a credencial é vinculada. É esse vínculo que confere resistência a phishing (seção 2.7).
-- **User handle**: identificador do usuário, definido pelo servidor (até 64 bytes), recomendado como valor aleatório, sem relação com dados pessoais [CITAR: especificação WebAuthn]. Neste projeto, 32 bytes aleatórios.
-- **Contador de assinaturas**: valor incrementado pelo autenticador a cada uso, usado para detectar clonagem. Muitos autenticadores de passkeys sincronizáveis retornam sempre zero, de modo que a verificação do contador só é aplicável quando ele é utilizado [CITAR].
+- **User handle**: identificador do usuário, definido pelo servidor (até 64 bytes), recomendado como valor aleatório, sem relação com dados pessoais . Neste projeto, 32 bytes aleatórios.
+- **Contador de assinaturas**: valor incrementado pelo autenticador a cada uso, usado para detectar clonagem. Muitos autenticadores de passkeys sincronizáveis retornam sempre zero, de modo que a verificação do contador só é aplicável quando ele é utilizado .
 - **Credencial detectável** (*discoverable credential*, ou *resident key*): armazena o user handle no autenticador, permitindo que o login ocorra **sem que o usuário informe um nome**, pois o autenticador apresenta as credenciais disponíveis para aquele RP ID.
 
 ### 2.4 Cerimônia de registro
@@ -95,7 +94,7 @@ sequenceDiagram
     S-->>B: Registro concluído e sessão iniciada
 ```
 
-Na etapa 11, o servidor verifica que: (a) o **desafio** devolvido no `clientDataJSON` é o que foi emitido; (b) a **origem** declarada pelo navegador é a esperada; (c) o *hash* do **RP ID** em `authenticatorData` corresponde ao do servidor; (d) o *flag* de **presença do usuário** (UP) está ativo e, se exigido, o de **verificação do usuário** (UV); e (e) o algoritmo da chave está entre os aceitos. Opcionalmente, verificaria a **atestação** (*attestation*), que prova o modelo do autenticador. Este projeto solicita `attestation: "none"`, pois a atestação só é necessária quando a aplicação precisa restringir fabricantes (cenários regulados) e introduz dependência do serviço de metadados da FIDO Alliance [CITAR].
+Na etapa 11, o servidor verifica que: (a) o **desafio** devolvido no `clientDataJSON` é o que foi emitido; (b) a **origem** declarada pelo navegador é a esperada; (c) o *hash* do **RP ID** em `authenticatorData` corresponde ao do servidor; (d) o *flag* de **presença do usuário** (UP) está ativo e, se exigido, o de **verificação do usuário** (UV); e (e) o algoritmo da chave está entre os aceitos. Opcionalmente, verificaria a **atestação** (*attestation*), que prova o modelo do autenticador. Este projeto solicita `attestation: "none"`, pois a atestação só é necessária quando a aplicação precisa restringir fabricantes (cenários regulados) e introduz dependência do serviço de metadados da FIDO Alliance .
 
 ### 2.5 Cerimônia de autenticação
 
@@ -126,7 +125,7 @@ A etapa 5 é a base da resistência a phishing: o navegador, e não o usuário, 
 
 ### 2.6 Passkeys: credenciais sincronizáveis e vinculadas ao dispositivo
 
-O termo **passkey** designa, na terminologia da FIDO Alliance, credenciais FIDO que substituem senhas, tipicamente **detectáveis** e, em muitas implementações, **sincronizáveis** entre os dispositivos do usuário por um provedor de credenciais (por exemplo, o gerenciador de chaves do sistema operacional ou de um aplicativo de terceiros) [CITAR: FIDO Alliance]. Distinguem-se, portanto:
+O termo **passkey** designa, na terminologia da FIDO Alliance, credenciais FIDO que substituem senhas, tipicamente **detectáveis** e, em muitas implementações, **sincronizáveis** entre os dispositivos do usuário por um provedor de credenciais (por exemplo, o gerenciador de chaves do sistema operacional ou de um aplicativo de terceiros) . Distinguem-se, portanto:
 
 | Tipo | Onde reside a chave privada | Vantagem | Risco |
 |---|---|---|---|
@@ -154,7 +153,7 @@ A última linha explicita um limite frequentemente omitido: passkeys eliminam a 
 ### 2.8 Limitações do mecanismo
 
 - **Recuperação de acesso.** Não há "esqueci minha senha". A recuperação depende de outras credenciais cadastradas, do provedor de sincronização ou de um mecanismo alternativo, ponto citado de forma recorrente na literatura revisada [Yusop et al. 2025]. O guia de tokens de software aborda uma contingência.
-- **Dependência do ecossistema.** A experiência de sincronização varia entre fornecedores de plataforma e a portabilidade entre provedores ainda é limitada [CITAR].
+- **Dependência do ecossistema.** A experiência de sincronização varia entre fornecedores de plataforma e a portabilidade entre provedores ainda é limitada .
 - **Compreensão do usuário.** Estudos de usabilidade indicam equívocos sobre o que é armazenado no dispositivo e sobre biometria [Yusop et al. 2025].
 - **Atestação e confiança no autenticador.** Com `attestation: "none"`, o servidor confia na declaração do autenticador, sem validar fabricante ou modelo.
 - **Enumeração de contas.** Informar que um nome de usuário já existe revela sua existência (ver seção 8).
@@ -177,7 +176,7 @@ flowchart LR
 | Tecnologia de terceiros | Papel | É necessária para este projeto? |
 |---|---|---|
 | **Provedor de credenciais** (por exemplo, o gerenciador de chaves da Apple, do Google ou da Microsoft, ou aplicativos de terceiros) | Armazena e sincroniza as passkeys **no lado do usuário**. Para a parte confiável, é transparente: o servidor só recebe a chave pública e a assinatura | Não é contratada pelo desenvolvedor. Já faz parte do dispositivo do usuário |
-| **Transporte híbrido** (QR Code + Bluetooth) | Permite usar a passkey do celular em outro computador. Usa Bluetooth para verificar proximidade e um túnel de comunicação mantido por fornecedores de plataforma **[CITAR: CTAP 2.2; verificar detalhes]** | Não. É implementado pelo navegador e pelo sistema operacional, sem código da aplicação |
+| **Transporte híbrido** (QR Code + Bluetooth) | Permite usar a passkey do celular em outro computador. Usa Bluetooth para verificar proximidade e um túnel de comunicação mantido por fornecedores de plataforma  | Não. É implementado pelo navegador e pelo sistema operacional, sem código da aplicação |
 | **FIDO Metadata Service (MDS)** | Fornece metadados de autenticadores, usados para validar atestação | Não. Dispensado com `attestation: "none"` |
 | **Hospedagem e HTTPS** (AWS, Google Cloud, outra, ou um túnel como Cloudflare Tunnel e ngrok) | Necessários apenas para expor o serviço a **outros dispositivos**, pois o WebAuthn exige HTTPS fora de `localhost` | Opcional: só para testar em um celular real ou publicar. Qualquer provedor serve, bastando ajustar `ORIGIN` e `RP_ID` |
 | **Aplicativos nativos** (Android e iOS) | Exigem associação entre aplicativo e domínio (Digital Asset Links no Android; arquivo `apple-app-site-association` no iOS) | Não, pois o projeto é web |
@@ -270,7 +269,7 @@ A aplicação fica responsável por **persistir** as chaves públicas, **guardar
 
 1. **Desafio na sessão do servidor, com uso único e validade de 5 minutos** (seção 5.5).
 2. **User handle aleatório**, desvinculado do nome de usuário (seção 5.7).
-3. **Lista de algoritmos fixada** em `[-8, -7, -257]` (EdDSA, ES256 e RS256). Na versão 14 do SimpleWebAuthn, a lista padrão pode incluir um algoritmo pós-quântico quando o runtime o suporta, o que tornaria o formato das novas credenciais dependente da versão do Node.js. Fixar a lista elimina essa variação e é aplicado na geração das opções e na verificação [CITAR: notas de versão do SimpleWebAuthn v14].
+3. **Lista de algoritmos fixada** em `[-8, -7, -257]` (EdDSA, ES256 e RS256). Na versão 14 do SimpleWebAuthn, a lista padrão pode incluir um algoritmo pós-quântico quando o runtime o suporta, o que tornaria o formato das novas credenciais dependente da versão do Node.js. Fixar a lista elimina essa variação e é aplicado na geração das opções e na verificação .
 4. **Credenciais detectáveis** (`residentKey: "required"`), para permitir login sem nome de usuário.
 5. **`attestation: "none"`**, por privacidade e para evitar dependências externas.
 6. **Impedimento de remover a última passkey**, para evitar o bloqueio da conta.
@@ -333,7 +332,7 @@ npm install
 
 Dependências de execução:
 
-- `@simplewebauthn/server` e `@simplewebauthn/browser`: implementação do protocolo (versão 14; segundo as notas de versão, a 14.0.2 corrige duas vulnerabilidades de severidade moderada do pacote de servidor, de modo que o projeto exige ao menos essa versão **[CITAR: avisos de segurança do projeto]**).
+- `@simplewebauthn/server` e `@simplewebauthn/browser`: implementação do protocolo (versão 14; segundo as notas de versão, a 14.0.2 corrige duas vulnerabilidades de severidade moderada do pacote de servidor, de modo que o projeto exige ao menos essa versão ).
 - `express` (versão 5, que encaminha automaticamente erros de funções assíncronas ao tratador de erros) e `express-session`: servidor HTTP e sessão.
 
 Dependências de desenvolvimento: `typescript`, `tsx` (executa TypeScript diretamente) e as definições de tipos.
@@ -1653,9 +1652,9 @@ A implementação é de **referência didática**. Para uso real, considere:
 5. **Enumeração de contas no registro.** A resposta 409 revela que um nome existe. Alternativas: fluxo de registro por e-mail verificado ou mensagens indistintas.
 6. **Recuperação de acesso.** Não implementada. O guia de tokens de software apresenta um mecanismo de contingência; em produção, também são comuns verificação de identidade, e-mail verificado e múltiplas passkeys obrigatórias.
 7. **Atestação**, apenas se houver requisito regulatório de restringir autenticadores.
-8. **Preenchimento automático (*conditional UI*)**, que sugere a passkey no campo de usuário, e a **API de sinalização** (*Signal API*) do navegador, que informa o provedor de credenciais sobre remoções de passkeys; ambas disponíveis na biblioteca em suas versões recentes, e não utilizadas aqui para manter o escopo enxuto [CITAR: documentação do SimpleWebAuthn].
+8. **Preenchimento automático (*conditional UI*)**, que sugere a passkey no campo de usuário, e a **API de sinalização** (*Signal API*) do navegador, que informa o provedor de credenciais sobre remoções de passkeys; ambas disponíveis na biblioteca em suas versões recentes, e não utilizadas aqui para manter o escopo enxuto .
 9. **Autenticação pós-login.** Como visto na seção 2.7, o mecanismo não protege a sessão. Considere expiração curta e reautenticação para operações sensíveis.
-10. **Aspectos legais.** Passkeys não armazenam dados biométricos no servidor, o que reduz a exposição a obrigações da LGPD relativas a dados sensíveis; o tratamento do nome de usuário e de metadados continua sujeito à lei [CITAR: Lei nº 13.709/2018].
+10. **Aspectos legais.** Passkeys não armazenam dados biométricos no servidor, o que reduz a exposição a obrigações da LGPD relativas a dados sensíveis; o tratamento do nome de usuário e de metadados continua sujeito à lei .
 11. **Compatibilidade com chaves de segurança físicas.** O código é o mesmo, porém **não foi validado em hardware** neste trabalho.
 
 ---
@@ -1681,10 +1680,10 @@ A implementação é de **referência didática**. Para uso real, considere:
 
 > Completar no formato exigido pela instituição. Fontes primárias sugeridas:
 
-- W3C. *Web Authentication: An API for accessing Public Key Credentials*. **[CITAR: nível e data da especificação consultada]**
-- FIDO Alliance. *Client to Authenticator Protocol (CTAP)*. **[CITAR: versão consultada]**
-- FIDO Alliance. Materiais sobre passkeys. **[CITAR]**
-- SimpleWebAuthn. Documentação e notas de versão da v14. https://simplewebauthn.dev — **[CITAR: data de acesso: 20/10/2026]**
+- W3C. *Web Authentication: An API for accessing Public Key Credentials*.
+- FIDO Alliance. *Client to Authenticator Protocol (CTAP)*.
+- FIDO Alliance. Materiais sobre passkeys.
+- SimpleWebAuthn. Documentação e notas de versão da v14. https://simplewebauthn.dev
 - Yusop, M. I. M. et al. (2025). Advancing passwordless authentication: a systematic review of methods, challenges, and future directions for secure user identity. *IEEE Access*, 13:13919–13943.
 - Stallings, W. and Brown, L. (2018). *Computer Security: Principles and Practice*. Pearson, 4. ed.
 - Weir, M. et al. (2010). Testing metrics for password creation policies by attacking large sets of revealed passwords. *ACM CCS*, p. 162–175.

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guia de TOTP — Implementação de referência</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main>
+    <h1>Tokens de software (TOTP)</h1>
+    <p class="lead">Implementação de referência do TCC — código temporário de 6 dígitos gerado por um aplicativo autenticador, com códigos de recuperação.</p>
+
+    <p class="alert">Aviso didático: o TOTP <strong>não resiste a phishing em tempo real</strong>. Aqui ele atua como mecanismo de contingência e recuperação, não como o método mais forte.</p>
+
+    <section id="guest">
+      <h2>1. Cadastrar autenticador</h2>
+
+      <div id="enroll-step1">
+        <label for="reg-username">Nome de usuário</label>
+        <input id="reg-username" type="text" autocomplete="username" placeholder="ex.: camila">
+        <button id="btn-enroll-start" type="button">Gerar QR Code</button>
+      </div>
+
+      <div id="enroll-step2" class="panel" hidden>
+        <p>Escaneie o QR Code com um aplicativo autenticador (Google Authenticator, Microsoft Authenticator, Aegis, Bitwarden, 1Password, entre outros) e informe o código exibido.</p>
+        <img id="enroll-qr" alt="QR Code para configurar o aplicativo autenticador" width="240" height="240">
+        <p class="hint">Sem câmera? Digite a chave manualmente: <code id="enroll-secret"></code></p>
+        <label for="enroll-code">Código atual do aplicativo</label>
+        <input id="enroll-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="000000">
+        <button id="btn-enroll-confirm" type="button">Confirmar</button>
+      </div>
+
+      <div id="enroll-step3" class="panel" hidden>
+        <h3>Códigos de recuperação</h3>
+        <p><strong>Guarde-os agora, em local seguro.</strong> Eles não serão exibidos novamente. Cada código vale uma única vez e permite entrar caso você perca o aplicativo.</p>
+        <pre id="enroll-codes"></pre>
+        <label><input id="enroll-saved" type="checkbox"> Guardei os códigos de recuperação</label>
+        <button id="btn-enroll-done" type="button" disabled>Continuar</button>
+      </div>
+
+      <h2>2. Entrar</h2>
+      <label for="login-username">Nome de usuário</label>
+      <input id="login-username" type="text" autocomplete="username">
+      <label for="login-code" id="login-code-label">Código do aplicativo autenticador</label>
+      <input id="login-code" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="000000">
+      <button id="btn-login" type="button">Entrar</button>
+      <button id="btn-toggle-recovery" type="button" class="secondary">Usar código de recuperação</button>
+    </section>
+
+    <section id="account" hidden>
+      <h2>Sessão autenticada</h2>
+      <p>Usuário: <strong id="who"></strong> — entrou com: <strong id="method"></strong></p>
+      <p>Códigos de recuperação restantes: <strong id="recovery-left"></strong></p>
+      <p id="rotate-hint" class="alert" hidden>Você entrou com um código de recuperação. Se perdeu o aparelho, configure um novo autenticador abaixo.</p>
+
+      <div class="panel">
+        <h3>Trocar o autenticador</h3>
+        <button id="btn-rotate-start" type="button">Configurar novo autenticador</button>
+        <div id="rotate-step2" hidden>
+          <img id="rotate-qr" alt="QR Code do novo autenticador" width="240" height="240">
+          <p class="hint">Chave manual: <code id="rotate-secret"></code></p>
+          <label for="rotate-code">Código do novo aplicativo</label>
+          <input id="rotate-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="000000">
+          <button id="btn-rotate-confirm" type="button">Confirmar troca</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Gerar novos códigos de recuperação</h3>
+        <p class="hint">Exige um código atual do aplicativo. Os códigos anteriores deixam de valer.</p>
+        <label for="regen-code">Código atual do aplicativo</label>
+        <input id="regen-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="000000">
+        <button id="btn-regen" type="button">Gerar novos códigos</button>
+      </div>
+
+      <div id="codes-panel" class="panel" hidden>
+        <h3>Novos códigos de recuperação</h3>
+        <p><strong>Guarde-os agora.</strong> Não serão exibidos novamente.</p>
+        <pre id="codes-view"></pre>
+      </div>
+
+      <button id="btn-logout" type="button" class="secondary">Sair</button>
+
+      <h3>Trilha de eventos</h3>
+      <table>
+        <thead><tr><th>Quando</th><th>Evento</th><th>Detalhe</th></tr></thead>
+        <tbody id="events"></tbody>
+      </table>
+    </section>
+
+    <p id="status" role="status" aria-live="polite"></p>
+
+    <h3>Registro das etapas</h3>
+    <div id="log" class="log"></div>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>

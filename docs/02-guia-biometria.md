@@ -1,7 +1,7 @@
 # Guia de Uso 2 — Biometria Local (WebAuthn com verificação do usuário)
 
 > Parte do Trabalho de Conclusão de Curso *Investigação de Protocolos de Passwordless Authentication: uma proposta de guia* (UTFPR, Dois Vizinhos).
-> Versões das bibliotecas consultadas em 20/10/2026. Os trechos marcados com **[CITAR]** exigem referência bibliográfica antes da publicação do texto.
+> Versões das bibliotecas consultadas em 20/10/2026.
 
 ## Sumário
 
@@ -36,13 +36,13 @@ O guia apresenta (i) a fundamentação teórica da biometria como fator de auten
 
 ### 2.1 A biometria como fator de autenticação
 
-Os fatores de autenticação classificam-se em *algo que o usuário sabe* (senha, PIN), *algo que possui* (dispositivo, chave) e *algo que o usuário é* (característica biológica) [CITAR: Stallings and Brown 2018]. A biometria física pertence ao terceiro grupo e se caracteriza por três propriedades: o usuário não precisa memorizá-la, não pode ser esquecida em casa e é de difícil replicação, o que explica a sua ampla adoção [Yusop et al. 2025]. Distingue-se da **autenticação comportamental** (digitação, marcha, interação com o dispositivo), que analisa padrões dinâmicos e não é abordada neste trabalho por motivos apresentados na seção de seleção de mecanismos.
+Os fatores de autenticação classificam-se em *algo que o usuário sabe* (senha, PIN), *algo que possui* (dispositivo, chave) e *algo que o usuário é* (característica biológica) . A biometria física pertence ao terceiro grupo e se caracteriza por três propriedades: o usuário não precisa memorizá-la, não pode ser esquecida em casa e é de difícil replicação, o que explica a sua ampla adoção [Yusop et al. 2025]. Distingue-se da **autenticação comportamental** (digitação, marcha, interação com o dispositivo), que analisa padrões dinâmicos e não é abordada neste trabalho por motivos apresentados na seção de seleção de mecanismos.
 
-Há, contudo, uma diferença estrutural em relação a senhas e chaves: a biometria **não é um segredo**. Impressões digitais e a face deixam vestígios e podem ser fotografadas; além disso, **não podem ser revogadas** como uma senha. Por essa razão, diretrizes de identidade digital recomendam que a biometria seja empregada como parte de uma autenticação multifator, associada a um autenticador físico, e não como credencial isolada [CITAR: NIST SP 800-63B]. A seção 2.6 mostra como o WebAuthn materializa esse princípio.
+Há, contudo, uma diferença estrutural em relação a senhas e chaves: a biometria **não é um segredo**. Impressões digitais e a face deixam vestígios e podem ser fotografadas; além disso, **não podem ser revogadas** como uma senha. Por essa razão, diretrizes de identidade digital recomendam que a biometria seja empregada como parte de uma autenticação multifator, associada a um autenticador físico, e não como credencial isolada . A seção 2.6 mostra como o WebAuthn materializa esse princípio.
 
 ### 2.2 O ciclo biométrico
 
-Um sistema biométrico executa, em geral, as etapas seguintes [CITAR]:
+Um sistema biométrico executa, em geral, as etapas seguintes :
 
 1. **Captura:** o sensor adquire uma amostra (imagem da digital, imagem facial, etc.).
 2. **Extração de características:** a amostra é convertida em um conjunto de atributos discriminantes.
@@ -54,9 +54,9 @@ Distinguem-se duas formas de uso. Na **verificação** (comparação 1:1), o sis
 
 ### 2.3 Métricas de desempenho e ataques de apresentação
 
-A decisão por limiar é probabilística e gera dois tipos de erro: o **falso aceite** (taxa FAR, *False Acceptance Rate*: um impostor é aceito) e a **falsa rejeição** (taxa FRR ou FNR: o usuário legítimo é recusado). Reduzir uma eleva a outra, e o ponto em que se igualam define a **taxa de erro igual** (EER) [CITAR]. A revisão de Yusop et al. (2025) mostra que FAR, EER e FNR estão entre as métricas de acurácia mais empregadas nos estudos de autenticação biométrica e comportamental.
+A decisão por limiar é probabilística e gera dois tipos de erro: o **falso aceite** (taxa FAR, *False Acceptance Rate*: um impostor é aceito) e a **falsa rejeição** (taxa FRR ou FNR: o usuário legítimo é recusado). Reduzir uma eleva a outra, e o ponto em que se igualam define a **taxa de erro igual** (EER) . A revisão de Yusop et al. (2025) mostra que FAR, EER e FNR estão entre as métricas de acurácia mais empregadas nos estudos de autenticação biométrica e comportamental.
 
-Um terceiro aspecto é a resistência a **ataques de apresentação** (*spoofing*), em que se apresenta ao sensor uma réplica da característica (digital moldada, fotografia, máscara). A mitigação ocorre por técnicas de **detecção de vivacidade** (*liveness*) ou de detecção de ataques de apresentação (PAD), cuja avaliação é objeto de normas específicas [CITAR: ISO/IEC 30107]. A revisão sistemática registra vulnerabilidades de biometria a falsificação de características, por exemplo a partir de imagens da face, e propostas de reforço, como a leitura do diâmetro pupilar e dos batimentos cardíacos na íris [Yusop et al. 2025]. Ressalte-se que esses controles são responsabilidade do **fabricante do sensor e do sistema operacional**, e não da aplicação web.
+Um terceiro aspecto é a resistência a **ataques de apresentação** (*spoofing*), em que se apresenta ao sensor uma réplica da característica (digital moldada, fotografia, máscara). A mitigação ocorre por técnicas de **detecção de vivacidade** (*liveness*) ou de detecção de ataques de apresentação (PAD), cuja avaliação é objeto de normas específicas . A revisão sistemática registra vulnerabilidades de biometria a falsificação de características, por exemplo a partir de imagens da face, e propostas de reforço, como a leitura do diâmetro pupilar e dos batimentos cardíacos na íris [Yusop et al. 2025]. Ressalte-se que esses controles são responsabilidade do **fabricante do sensor e do sistema operacional**, e não da aplicação web.
 
 ### 2.4 Arquiteturas: biometria no servidor *versus* biometria local
 
@@ -90,7 +90,7 @@ Pelas razões acima, este trabalho adota exclusivamente a **abordagem B**.
 
 ### 2.5 Hardware seguro e fornecedores de plataforma
 
-Na biometria local, o modelo biométrico é armazenado e comparado em um componente isolado do restante do sistema, de modo que nem o sistema operacional comum nem as aplicações o acessam. Exemplos, por plataforma [CITAR: documentação dos fornecedores]:
+Na biometria local, o modelo biométrico é armazenado e comparado em um componente isolado do restante do sistema, de modo que nem o sistema operacional comum nem as aplicações o acessam. Exemplos, por plataforma :
 
 | Plataforma | Recurso biométrico | Componente isolado |
 |---|---|---|
@@ -98,11 +98,11 @@ Na biometria local, o modelo biométrico é armazenado e comparado em um compone
 | Android | Impressão digital, face (conforme o aparelho) | Ambiente de execução confiável (TEE) ou módulo de segurança dedicado |
 | Windows | Windows Hello (digital, face) | Módulo de plataforma confiável (TPM), quando disponível |
 
-Em plataformas Android, as biometrias são classificadas por nível de robustez, sendo a classe de maior robustez a adequada ao desbloqueio de chaves criptográficas [CITAR]. É esse componente que realiza a comparação e que, em caso de sucesso, **libera o uso de uma chave privada**. Esse encadeamento é o que conecta a biometria ao protocolo (seção 2.6).
+Em plataformas Android, as biometrias são classificadas por nível de robustez, sendo a classe de maior robustez a adequada ao desbloqueio de chaves criptográficas . É esse componente que realiza a comparação e que, em caso de sucesso, **libera o uso de uma chave privada**. Esse encadeamento é o que conecta a biometria ao protocolo (seção 2.6).
 
 ### 2.6 Como a web utiliza a biometria: a verificação do usuário (UV)
 
-No WebAuthn, a biometria não é transmitida: ela serve como **gesto de verificação do usuário** (*user verification*, UV) que autoriza o autenticador a usar a chave privada. Duas informações distintas são produzidas e assinadas pelo autenticador em `authenticatorData` [CITAR: especificação WebAuthn]:
+No WebAuthn, a biometria não é transmitida: ela serve como **gesto de verificação do usuário** (*user verification*, UV) que autoriza o autenticador a usar a chave privada. Duas informações distintas são produzidas e assinadas pelo autenticador em `authenticatorData` :
 
 - **UP (*user presence*):** houve um gesto de presença (por exemplo, o toque em um botão).
 - **UV (*user verification*):** o autenticador **verificou** o usuário por um método local (biometria, PIN ou padrão).
@@ -145,14 +145,14 @@ A política de verificação é comunicada ao autenticador pela opção `userVer
 
 Dois pontos são essenciais e frequentemente mal compreendidos:
 
-1. **Pedir não é garantir.** A opção `userVerification: "required"` é apenas um pedido encaminhado ao navegador e ao autenticador. A garantia vem de o **servidor verificar o flag UV** da resposta. Por isso a implementação aplica a política em dois momentos (geração das opções e verificação) e fixa a política vigente no desafio (seção 5.6). A biblioteca utilizada exige, por padrão, UV na verificação e sempre exige o flag de presença (UP); a verificação de UV só é dispensada quando o desenvolvedor assim o declara [CITAR: código-fonte e documentação do SimpleWebAuthn].
-2. **O servidor não sabe *qual* método foi usado.** O flag UV indica que o autenticador verificou o usuário, mas não se foi por biometria, PIN ou padrão de desbloqueio. Do ponto de vista do servidor, a "biometria local" é, rigorosamente, **verificação local do usuário**. Para ampliar a garantia, seria possível solicitar a *atestação* do autenticador e consultar metadados e certificações de componentes biométricos da FIDO Alliance [CITAR], o que introduz dependências e foge ao escopo deste guia.
+1. **Pedir não é garantir.** A opção `userVerification: "required"` é apenas um pedido encaminhado ao navegador e ao autenticador. A garantia vem de o **servidor verificar o flag UV** da resposta. Por isso a implementação aplica a política em dois momentos (geração das opções e verificação) e fixa a política vigente no desafio (seção 5.6). A biblioteca utilizada exige, por padrão, UV na verificação e sempre exige o flag de presença (UP); a verificação de UV só é dispensada quando o desenvolvedor assim o declara .
+2. **O servidor não sabe *qual* método foi usado.** O flag UV indica que o autenticador verificou o usuário, mas não se foi por biometria, PIN ou padrão de desbloqueio. Do ponto de vista do servidor, a "biometria local" é, rigorosamente, **verificação local do usuário**. Para ampliar a garantia, seria possível solicitar a *atestação* do autenticador e consultar metadados e certificações de componentes biométricos da FIDO Alliance , o que introduz dependências e foge ao escopo deste guia.
 
-Uma terceira ressalva: UV verdadeiro não demonstra que o portador é o **titular da conta**, mas que é alguém **autorizado a desbloquear aquele autenticador**. Quem conhece o PIN do aparelho pode, em geral, cadastrar a própria biometria no sistema operacional, e passará a satisfazer a verificação. A segurança resultante depende, portanto, do bloqueio de tela do dispositivo, fora do controle da aplicação [CITAR].
+Uma terceira ressalva: UV verdadeiro não demonstra que o portador é o **titular da conta**, mas que é alguém **autorizado a desbloquear aquele autenticador**. Quem conhece o PIN do aparelho pode, em geral, cadastrar a própria biometria no sistema operacional, e passará a satisfazer a verificação. A segurança resultante depende, portanto, do bloqueio de tela do dispositivo, fora do controle da aplicação .
 
 ### 2.8 Confirmação de ações sensíveis (*step-up*)
 
-Em vez de exigir biometria a cada requisição, aplicações adotam o princípio da **autenticação recente**: operações de maior risco (transferências, alteração de dados de acesso, exclusão de dados) exigem que o usuário tenha comprovado sua identidade **há pouco tempo**, mesmo com a sessão aberta [CITAR: NIST SP 800-63B]. Quando a verificação é antiga ou inexistente, o sistema solicita nova confirmação, o que se denomina *step-up*.
+Em vez de exigir biometria a cada requisição, aplicações adotam o princípio da **autenticação recente**: operações de maior risco (transferências, alteração de dados de acesso, exclusão de dados) exigem que o usuário tenha comprovado sua identidade **há pouco tempo**, mesmo com a sessão aberta . Quando a verificação é antiga ou inexistente, o sistema solicita nova confirmação, o que se denomina *step-up*.
 
 ```mermaid
 sequenceDiagram
@@ -201,7 +201,7 @@ Limitações adicionais: **irrevogabilidade** da característica (não se "troca
 
 ### 2.10 Aspectos legais: LGPD
 
-A Lei Geral de Proteção de Dados (Lei nº 13.709/2018) classifica o **dado biométrico**, quando vinculado a uma pessoa natural, como **dado pessoal sensível**, sujeito a bases legais mais restritas [CITAR: art. 5º, II, e art. 11]. Na biometria local, a aplicação não coleta nem armazena o dado biométrico, o que **reduz** a exposição do controlador. Persistem, contudo, o tratamento do nome de usuário, dos metadados e da trilha de eventos. A conclusão jurídica para um caso concreto exige análise específica [CITAR].
+A Lei Geral de Proteção de Dados (Lei nº 13.709/2018) classifica o **dado biométrico**, quando vinculado a uma pessoa natural, como **dado pessoal sensível**, sujeito a bases legais mais restritas . Na biometria local, a aplicação não coleta nem armazena o dado biométrico, o que **reduz** a exposição do controlador. Persistem, contudo, o tratamento do nome de usuário, dos metadados e da trilha de eventos. A conclusão jurídica para um caso concreto exige análise específica .
 
 ### 2.11 Tecnologias de terceiros: quando são necessárias
 
@@ -212,7 +212,7 @@ Assim como nas passkeys, **a biometria local não exige a contratação de servi
 | **Sensor, sistema operacional e hardware seguro** (Apple, Google, Microsoft e fabricantes de dispositivos) | Capturam, comparam e protegem o modelo biométrico; liberam a chave privada | Fazem parte do dispositivo do usuário. **Não são contratados** pelo desenvolvedor |
 | **Navegador (API WebAuthn)** | Intermedia a comunicação com o autenticador e aplica as verificações de origem | Sim, e já está instalado |
 | **SDKs nativos** (por exemplo, APIs de biometria do Android e do iOS) | Permitem o uso da biometria em aplicativos móveis nativos | Não, pois o projeto é web. Seriam o caminho de uma extensão nativa |
-| **Serviços de reconhecimento biométrico em nuvem** (por exemplo, reconhecimento facial oferecidos por provedores como Amazon e Microsoft) **[CITAR]** | Comparam imagens ou modelos enviados pela aplicação | **Não, deliberadamente.** Correspondem à abordagem A (2.4): exigem transmitir dado biométrico a terceiros, com os riscos de irreversibilidade e as implicações da LGPD |
+| **Serviços de reconhecimento biométrico em nuvem** (por exemplo, reconhecimento facial oferecidos por provedores como Amazon e Microsoft)  | Comparam imagens ou modelos enviados pela aplicação | **Não, deliberadamente.** Correspondem à abordagem A (2.4): exigem transmitir dado biométrico a terceiros, com os riscos de irreversibilidade e as implicações da LGPD |
 | **Atestação e metadados da FIDO Alliance** | Permitem validar modelo e certificação do autenticador | Não, por usar `attestation: "none"` |
 | **Hospedagem e HTTPS** (qualquer provedor, ou túnel como Cloudflare Tunnel e ngrok) | O WebAuthn exige HTTPS fora de `localhost` | Apenas para testar em outro dispositivo ou publicar |
 
@@ -356,7 +356,7 @@ Instale as dependências. O comando gera o `package-lock.json`, que **deve ser v
 npm install
 ```
 
-As dependências são as mesmas do Guia 1: `@simplewebauthn/server` e `@simplewebauthn/browser` (versão 14, com a 14.0.2 ou superior por correções de segurança no pacote de servidor **[CITAR: avisos de segurança do projeto]**), `express` (versão 5) e `express-session`.
+As dependências são as mesmas do Guia 1: `@simplewebauthn/server` e `@simplewebauthn/browser` (versão 14, com a 14.0.2 ou superior por correções de segurança no pacote de servidor ), `express` (versão 5) e `express-session`.
 
 ### 5.2 Configurar o TypeScript e o Git
 
@@ -2298,7 +2298,7 @@ A análise é **qualitativa** e não substitui testes de penetração.
 
 ## 8. Limitações e caminho para produção
 
-1. **UV não distingue biometria de PIN.** Se o requisito de negócio for biometria estrita, nenhuma configuração do WebAuthn a garante. Avalie atestação e certificações de componentes biométricos [CITAR] ou limite-se a escolher o nível de risco aceitável.
+1. **UV não distingue biometria de PIN.** Se o requisito de negócio for biometria estrita, nenhuma configuração do WebAuthn a garante. Avalie atestação e certificações de componentes biométricos  ou limite-se a escolher o nível de risco aceitável.
 2. **Dependência do dispositivo.** Falso aceite, vivacidade e controle de cadastro de novas biometrias são do sistema operacional. Considere políticas de risco (por exemplo, *step-up* para operações críticas e alertas de novos dispositivos).
 3. **Acessibilidade e alternativas.** Ofereça meio alternativo para usuários sem biometria utilizável, em vez de bloquear o acesso.
 4. **Recuperação de acesso.** Não implementada. O guia de tokens de software apresenta uma contingência.
@@ -2306,7 +2306,7 @@ A análise é **qualitativa** e não substitui testes de penetração.
 6. **Sessões e estado.** A sessão e o instante de verificação (`uvAt`) ficam em memória. Em produção, use armazenamento persistente e compartilhado.
 7. **Limitação de tentativas**, **CSRF dedicado**, **HTTPS obrigatório** e cookies com prefixo `__Host-` (ver Guia 1, seção 8).
 8. **Modo laboratório.** Jamais habilitar em produção; a política deve ser decisão do servidor.
-9. **Extensão nativa (não implementada).** Aplicativos móveis podem usar as APIs biométricas do sistema, com a chave protegida pelo hardware seguro; é uma extensão natural deste trabalho **[CITAR: documentação Android e iOS]**.
+9. **Extensão nativa (não implementada).** Aplicativos móveis podem usar as APIs biométricas do sistema, com a chave protegida pelo hardware seguro; é uma extensão natural deste trabalho .
 10. **LGPD.** A biometria local reduz a exposição, mas não elimina o tratamento de metadados e da trilha de eventos (seção 2.10).
 11. **Compatibilidade com outros autenticadores** (por exemplo, chaves físicas) **não foi validada em hardware**.
 
@@ -2333,11 +2333,11 @@ A análise é **qualitativa** e não substitui testes de penetração.
 
 > Completar no formato exigido pela instituição. Fontes primárias sugeridas:
 
-- W3C. *Web Authentication: An API for accessing Public Key Credentials*. **[CITAR: nível e data consultados]**
-- FIDO Alliance. Especificações e programa de certificação de componentes biométricos. **[CITAR]**
-- NIST. *SP 800-63B: Digital Identity Guidelines, Authentication and Lifecycle Management*. **[CITAR: revisão consultada]**
-- ISO/IEC 30107. *Biometric presentation attack detection*. **[CITAR]**
-- SimpleWebAuthn. Documentação e código-fonte (v14). https://simplewebauthn.dev — **[CITAR: data de acesso: 20/10/2026]**
+- W3C. *Web Authentication: An API for accessing Public Key Credentials*.
+- FIDO Alliance. Especificações e programa de certificação de componentes biométricos.
+- NIST. *SP 800-63B: Digital Identity Guidelines, Authentication and Lifecycle Management*.
+- ISO/IEC 30107. *Biometric presentation attack detection*.
+- SimpleWebAuthn. Documentação e código-fonte (v14). https://simplewebauthn.dev
 - Yusop, M. I. M. et al. (2025). Advancing passwordless authentication: a systematic review of methods, challenges, and future directions for secure user identity. *IEEE Access*, 13:13919–13943.
 - Stallings, W. and Brown, L. (2018). *Computer Security: Principles and Practice*. Pearson, 4. ed.
 - Brasil. Lei nº 13.709, de 14 de agosto de 2018 (LGPD).

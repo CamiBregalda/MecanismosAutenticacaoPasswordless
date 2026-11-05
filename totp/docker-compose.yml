@@ -1,0 +1,16 @@
+services:
+  totp:
+    build: .
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      PORT: "3000"
+      ORIGIN: "${ORIGIN:-http://localhost:3000}"
+      TOTP_ISSUER: "${TOTP_ISSUER:-Guia TOTP (TCC)}"
+      TOTP_TOLERANCE_SECONDS: "${TOTP_TOLERANCE_SECONDS:-30}"
+      APP_KEY: "${APP_KEY:?Defina APP_KEY no arquivo .env}"
+      SESSION_SECRET: "${SESSION_SECRET:?Defina SESSION_SECRET no arquivo .env}"
+      DB_PATH: "/data/totp.db"
+      TRUST_PROXY: "${TRUST_PROXY:-0}"
+    volumes:
+      - ./data:/data
