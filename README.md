@@ -12,7 +12,3 @@ Material prático do TCC *Investigação de Protocolos de Passwordless Authentic
 
 Node.js (LTS 22+), TypeScript, Express, SQLite. Bibliotecas: SimpleWebAuthn (passkeys e biometria) e otplib (TOTP).
 
-## Licenças
-
-- **Código-fonte:** MIT (arquivo [LICENSE](LICENSE)).
-- **Textos e guias** (`docs/`): sugere-se CC BY-SA 4.0, em linha com o trabalho principal. Defina antes de publicar.
